@@ -1,4 +1,4 @@
-const song = document.querySelector('audio')
+
 
 const canvas = document.querySelector('canvas')
 const canvasCtx = canvas.getContext('2d')
@@ -6,7 +6,7 @@ const canvasCtx = canvas.getContext('2d')
 canvas.width = window.innerWidth 
 canvas.height = window.innerHeight 
 
-
+let colorMagicNumber = 100
 
 
 
@@ -30,10 +30,11 @@ function draw () {
 
   for (let i = 0; i < bars; i++) {
     let radians = (Math.PI * 2) / bars
-    let barHeight = freqs[i] * 2.5
+    let barHeight = freqs[i] * 1.4
 
 
-    let color = `rgb(${freqs[i]}, ${100 - freqs[i]}, ${150} )`
+    let color = `rgb(${freqs[i]}, ${colorMagicNumber - freqs[i]}, ${colorMagicNumber} )`
+    //let color = `hsl(${freqs[i]}, ${colorMagicNumber - freqs[i]}, ${colorMagicNumber} )`
     
   
     let x = (canvas.width / 2) - Math.cos(radians * i) * radius
@@ -59,14 +60,28 @@ let ctx, source, analyser, freqs
 canvas.addEventListener('click', init)
 
 
+
 function init () {
-  ctx = new window.AudioContext()
+  //const song = document.querySelector('audio')
+  const song = new Audio()
+  song.src = 'sample2.mp3'
+  song.play()
+  ctx = new (window.AudioContext || window.webkitAudioContext)()
   source = ctx.createMediaElementSource(song) // attach the audio to the context
   analyser = ctx.createAnalyser()
   source.connect(analyser)
   analyser.connect(ctx.destination) // connect to destination
   freqs = new Uint8Array(analyser.frequencyBinCount)
-  song.play()
-
   draw()
+}
+
+window.addEventListener('mousemove', incrementColour)
+
+function incrementColour () {
+
+  if (colorMagicNumber > 254) {
+    colorMagicNumber = colorMagicNumber % 255
+  }
+
+  colorMagicNumber++
 }
