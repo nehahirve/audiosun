@@ -3,8 +3,11 @@
 const canvas = document.querySelector('canvas')
 const canvasCtx = canvas.getContext('2d')
 
-canvas.width = window.innerWidth 
-canvas.height = window.innerHeight 
+function resizeCanvas () {
+  canvas.width = window.innerWidth 
+  canvas.height = window.innerHeight 
+
+}
 
 let colorMagicNumber = 100
 
@@ -46,8 +49,8 @@ function draw () {
     canvasCtx.strokeStyle = color
     canvasCtx.fillStyle = color
     canvasCtx.beginPath()
-    canvasCtx.moveTo(x , y - canvas.height/2)
-    canvasCtx.lineTo(xEnd , yEnd - canvas.height/2)
+    canvasCtx.moveTo(x , y - canvas.height/8)
+    canvasCtx.lineTo(xEnd , yEnd - canvas.height/8)
     canvasCtx.stroke()
   }
 
@@ -62,9 +65,10 @@ canvas.addEventListener('click', init)
 
 
 function init () {
+  resizeCanvas()
   //const song = document.querySelector('audio')
   const song = new Audio()
-  song.src = 'sample2.mp3'
+  song.src = 'california.mp3'
   song.play()
   ctx = new (window.AudioContext || window.webkitAudioContext)()
   source = ctx.createMediaElementSource(song) // attach the audio to the context
