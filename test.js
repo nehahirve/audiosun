@@ -1,5 +1,3 @@
-
-
 const canvas = document.querySelector('canvas')
 const canvasCtx = canvas.getContext('2d')
 
