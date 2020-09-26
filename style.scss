@@ -3,6 +3,10 @@ canvas {
   height: 100%;
 }
 
+html {
+  cursor: crosshair;
+}
+
 #circle {
   width: 100px;
   height: 100px;
@@ -13,4 +17,21 @@ canvas {
 
 audio {
   display: none;
+}
+
+
+.start {
+  font-family: Georgia, 'Times New Roman', Times, serif, Helvetica, sans-serif;
+  font-size: 2rem;
+  color: orangered;
+  width: 100px;
+  position: fixed;
+  margin: auto;
+  height: 100px;
+  border: none;
+  cursor: crosshair;
+  outline: none;
+  background:none;
+  z-index: 100;
+
 }

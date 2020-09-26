@@ -33,11 +33,38 @@ function init () {
 
   var geometry2 = new THREE.PlaneGeometry( 200, 200, 32, 32);
   var material2 = new THREE.MeshLambertMaterial( {color: 0x1ffafa, side: THREE.DoubleSide} )
+  
   plane = new THREE.Mesh( geometry2, material2 )
-  scene.add( plane )
+  //scene.add( plane )
 
   plane.rotation.x = 1
   plane.position.y = -10
+
+  var size = 500;
+  var divisions = 50;
+  
+  var gridHelper = new THREE.GridHelper( size, divisions, 'magenta', 'magenta' );
+  scene.add( gridHelper )
+
+  gridHelper.position.y = -25
+
+
+  var params = {
+    exposure: 1,
+    bloomStrength: 1.5,
+    bloomThreshold: 0,
+    bloomRadius: 0
+  };
+
+  let bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			bloomPass.threshold = params.bloomThreshold;
+			bloomPass.strength = params.bloomStrength;
+			bloomPass.radius = params.bloomRadius;
+
+			composer = new THREE.EffectComposer( renderer );
+			composer.addPass( renderScene );
+			composer.addPass( bloomPass );
+
 
 }
 
