@@ -30,7 +30,7 @@ function draw () {
   //canvasCtx.strokeStyle = 'pink'
   canvasCtx.lineWidth = 4
   canvasCtx.fillRect(0, 0, canvas.width, canvas.height)
-
+  canvasCtx.setLineDash([])
 
   canvasCtx.beginPath();
   canvasCtx.arc(canvas.width/2, canvas.height/2, radius -20, 0, 2 * Math.PI);
@@ -53,18 +53,33 @@ function draw () {
   canvasCtx.arc(canvas.width/2, canvas.height/2, radius -55, 0, 2 * Math.PI);
   canvasCtx.stroke()
   canvasCtx.closePath()
-  canvasCtx.strokeStyle = 'yellow'
+  canvasCtx.strokeStyle = '#ffc800'
   canvasCtx.lineWidth = 7
   canvasCtx.beginPath();
   canvasCtx.arc(canvas.width/2, canvas.height/2, radius -70, 0, 2 * Math.PI);
   canvasCtx.stroke()
   canvasCtx.closePath()
+  canvasCtx.lineWidth = 1
+  canvasCtx.strokeStyle = 'orangered'
+  canvasCtx.beginPath();
+  canvasCtx.arc(canvas.width/2, canvas.height/2, radius -85, 0, 2 * Math.PI);
+  canvasCtx.stroke()
+  canvasCtx.closePath()
+  canvasCtx.strokeStyle = 'darkorange'
+  canvasCtx.beginPath();
+  canvasCtx.arc(canvas.width/2, canvas.height/2, radius -90, 0, 2 * Math.PI);
+  canvasCtx.stroke()
+  canvasCtx.closePath()
+
+
+
   canvasCtx.lineWidth = 4
+  
 
   
   
   
-  
+  canvasCtx.setLineDash([5, 5, 10, 15, 25, 20, 35, 10, 50])
 
   for (let i = 0; i < bars; i++) {
     let radians = (Math.PI * 2) / bars
@@ -138,4 +153,9 @@ function incrementColour () {
   }
 
   colorMagicNumber++
+}
+
+
+function noisy (number) {
+  return number + Math.floor(Math.random() * Math.floor(3))
 }
