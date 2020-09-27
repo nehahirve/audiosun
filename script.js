@@ -15,10 +15,10 @@ const colourPalette = {
     accent: '#FAF0E6'
   },
   cool: {
-    light: '#87CEFA',
-    medium: '#00BFFF',
+    light: '#00DFFF',
+    medium: '#008CFF',
     dark: '#0000CD',
-    complement: '#9ACD32',
+    complement: '#ffc800',
     accent: '#FAF0E6'
   }
 }
