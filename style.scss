@@ -8,16 +8,48 @@ canvas {
 }
 
 .play {
+  padding-right: 0px;
+  transition: 500ms;
   font-size: 2rem;
-  color: orangered;
-  width: 150px;
+  color: linen;
+  width: 200px;
   position: fixed;
-  height: 150px;
+  height: 200px;
   border-radius: 50%;
-  border: 2px linen dashed;
-  cursor: crosshair;
+  border: 7px orange solid;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
   background:none;
   &:focus {
     outline: none;
+  }
+  .innerone {
+    width: 150px;
+    z-index: -10;
+    position: absolute;
+    height: 150px;
+    left: 20px;
+    border-radius: 50%;
+    border: 4px orangered dashed;
+  }
+  .innertwo {
+    width: 220px;
+    z-index: -10;
+    position: absolute;
+    height: 220px;
+    left: -17px;
+    border-radius: 50%;
+    border: 2px darkorange solid;
+  }
+  .innerthree {
+    width: 80px;
+    z-index: -10;
+    position: absolute;
+    height: 80px;
+    left: 55px;
+    border-radius: 50%;
+    border: 2px darkorange solid;
   }
 }

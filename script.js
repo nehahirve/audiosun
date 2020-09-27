@@ -19,10 +19,11 @@ const startBtn = document.querySelector('.play')
 let WIDTH = canvas.width
 let HEIGHT = canvas.height
 
-let audioctx, source, audio, analyser, freqs, radius, dashIntervals
+let audioctx, source, analyser, freqs, radius,
+  radians, bars, factor, angle, meanFreq
 
 let isRunning = false
-
+let dashIntervals = []
 /*
 *********************************
 HELPER FUNCTIONS
@@ -30,7 +31,6 @@ HELPER FUNCTIONS
 */
 
 function drawRing (ctx, radius, weight, stroke) {
-  console.log(stroke)
   ctx.beginPath()
   ctx.strokeStyle = stroke
   ctx.lineWidth = weight
@@ -44,6 +44,22 @@ function center (el, halfsize) {
   el.style.left = `${(WIDTH / 2) - (halfsize)}px`
 }
 
+function handleDragOver (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+function togglePause () {
+  if (audioctx.state === 'running') {
+    isRunning = false
+    audioctx.suspend()
+  } else if (audioctx.state === 'suspended') {
+    isRunning = true
+    requestAnimationFrame(draw)
+    audioctx.resume()
+  }
+}
+
 /*
 *********************************
 ON LOAD
@@ -51,7 +67,9 @@ ON LOAD
 */
 
 resizeCanvas()
-startBtn.addEventListener('click', init)
+
+window.addEventListener('drop', init)
+window.addEventListener('dragover', handleDragOver, false)
 window.addEventListener('resize', resizeCanvas)
 
 /*
@@ -60,55 +78,104 @@ MAIN FUNCTIONS
 *********************************
 */
 
-function init () {
-  isRunning = true
-  startBtn.remove()
+function init (e)  {
+  isRunning = false
+  
+
+  startBtn.style.opacity = 0
+  factor = 1
+  
+  e.preventDefault()
+  e.stopPropagation()
+
+  if (audioctx) {
+    audioctx.suspend()
+    audioctx.close()
+  }
+
   audioctx = new (
     window.AudioContext || window.webkitAudioContext
-  )() // new audio context
-  audio = new Audio()
-  audio.src = 'media/sample.mp3'
+  )()
+  
 
-  source = audioctx.createMediaElementSource(audio)
-  analyser = audioctx.createAnalyser()
-  source.connect(analyser)
-  analyser.connect(audioctx.destination)
-
-  freqs = new Uint8Array(analyser.frequencyBinCount)
-
-  dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
-  audio.play()
-  draw()
+  window.addEventListener('click', togglePause)
+  
+  const file = e.dataTransfer.files[0]
+  const reader = new FileReader()
+  
+  reader.addEventListener('load', e => {
+    const data = e.target.result
+    console.log(data)
+    audioctx.decodeAudioData(data, buffer => {
+      source = audioctx.createBufferSource()
+      source.buffer = buffer
+      analyser = audioctx.createAnalyser()
+      analyser.connect(audioctx.destination)
+      source.connect(analyser)
+      source.start(0)
+      freqs = new Uint8Array(analyser.frequencyBinCount)
+      dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
+      angle = 0
+      factor = 1
+      threshold = 10
+      lastMean = 0
+      radians = (Math.PI * 2) / bars
+      isRunning = true
+      draw()
+    })
+  })
+  reader.readAsArrayBuffer(file)
 }
 
 function draw () {
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-  const bars = 200
+  factor -= 0.05
+  angle += 0.001
   radius = WIDTH > 500 ? 150 : 100
+
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
   drawInnerRings(ctx, radius)
-  console.log(radius)
+
+  ctx.setLineDash([5, 5])
+  ctx.beginPath()
+  ctx.strokeStyle = colourPalette.complement
+  ctx.lineWidth = 7
+  ctx.arc(
+    WIDTH / 2,
+    HEIGHT / 2,
+    radius - 70,
+    angle,
+    2 * Math.PI + angle
+  )
+  ctx.stroke()
+  ctx.closePath()
+  ctx.setLineDash([])
 
   ctx.lineWidth = 4
 
   ctx.setLineDash(dashIntervals)
   analyser.getByteFrequencyData(freqs)
 
+  const meanArray = []
+  const barFactor = WIDTH > 500 ? 1 : 0.4
+  
+
+
   for (let i = 0; i < bars; i++) {
-    const radians = (Math.PI * 2) / bars
-    let barHeight = freqs[i] * 1
-    if (barHeight > canvas.width / 3) barHeight = freqs[i] * 0.3
+    meanArray.push(freqs[i])
+    let barHeight = freqs[i] * barFactor
 
-    const color = `rgb(${255}, ${255 - freqs[i]}, ${0})`
-    const color2 = `rgb(${255}, ${200 - freqs[i]}, ${0})`
+    const barColour = `rgb(${255}, ${255 - freqs[i]}, ${0})`
 
-    const x = (WIDTH / 2) + Math.cos(radians * i) * radius
-    const xEnd = (WIDTH / 2) + Math.cos(radians * i) * (radius + barHeight)
-    const y = (HEIGHT / 2) + Math.sin(radians * i) * radius
-    const yEnd = (HEIGHT / 2) + Math.sin(radians * i) * (radius + barHeight)
+    const x = (WIDTH / 2) +
+      Math.cos(radians * (i + factor)) * radius
+    const xEnd = (WIDTH / 2) +
+      Math.cos(radians * (i + factor)) * (radius + barHeight)
+    const y = (HEIGHT / 2) +
+      Math.sin(radians * (i + factor)) * radius
+    const yEnd = (HEIGHT / 2) +
+      Math.sin(radians * (i + factor)) * (radius + barHeight)
 
-    ctx.strokeStyle = color
-    ctx.fillStyle = color2
+    ctx.strokeStyle = barColour
 
     ctx.beginPath()
     ctx.moveTo(x, y)
@@ -116,7 +183,13 @@ function draw () {
     ctx.stroke()
   }
 
-  requestAnimationFrame(draw)
+  meanFreq = average(meanArray)
+  if(meanFreq) {
+    ctx.fillStyle = `rgb(${255}, ${190 - meanFreq / 2}, ${0})`
+  } else {
+    ctx.fillStyle = colourPalette.complement
+  }
+  if (isRunning) requestAnimationFrame(draw)
 }
 
 function resizeCanvas () {
@@ -124,11 +197,21 @@ function resizeCanvas () {
   WIDTH = canvas.width
   canvas.height = window.innerHeight
   HEIGHT = canvas.height
-  ctx.fillStyle = colourPalette.light
+  ctx.fillStyle = colourPalette.complement
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
   if (!isRunning) {
-    center(startBtn, 75)
+    center(startBtn, 100)
   }
+  bars = WIDTH > 500 ? 200 : 100
+  
+}
+
+function average (array) {
+  const sum = array.reduce((sum, value) => {
+    return sum + value
+  })
+
+  return sum / array.length
 }
 
 function drawInnerRings (ctx, radius) {
@@ -137,8 +220,12 @@ function drawInnerRings (ctx, radius) {
   drawRing(ctx, radius - 30, 2, colourPalette.light)
   drawRing(ctx, radius - 40, 4, colourPalette.medium)
   drawRing(ctx, radius - 55, 4, colourPalette.medium)
-  drawRing(ctx, radius - 70, 7, colourPalette.complement)
   drawRing(ctx, radius - 85, 1, colourPalette.dark)
-  drawRing(ctx, radius - 90, 1, colourPalette.medium)
+  drawRing(ctx, radius - 90, 1, colourPalette.accent)
+  if (radius > 100) {
+    drawRing(ctx, radius - 110, 10, colourPalette.light)
+    drawRing(ctx, radius - 130, 3, colourPalette.medium)
+  } else {
+    drawRing(ctx, radius - 100, 10, colourPalette.light)
+  }
 }
-
