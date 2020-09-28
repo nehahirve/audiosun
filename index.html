@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☀️</text></svg>">
         <link rel="stylesheet" href="reset.css">
         <link rel="stylesheet" href="style.min.css">    
         <title>AudioSun</title>
@@ -11,11 +11,82 @@
 
     <body>
         <canvas></canvas>
-        <div class="play">drop&nbsp<br>audio<br>file&nbsp   
-            <div class="innerone"></div>
-            <div class="innertwo"></div>
-            <div class="innerthree"></div>
-        </div>
+        <main>
+            <div class="wrapper">            
+                <div class="ringone"></div>
+                <div class="ringtwo_start"></div>
+                <div class="ringtwo_end"></div>
+                <div class="ringthree_start"></div>
+                <div class="ringthree_end"></div>
+                <div class="ringfour_start"></div>
+                <div class="ringfour_end"></div>
+                <svg
+                id="text1"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 150 150"
+                >
+                    <circle cx="75" cy="75" r="75"/>
+                    <path
+                        id="curve1"
+                        d="M75,.75A74.25,74.25,0,1,1,.75,75,74.34,74.34,0,0,1,75,.75M75,0a75,75,0,1,0,75,75A75,75,0,0,0,75,0Z"
+                    />
+                    <text width="100">
+                        <textPath xlink:href="#curve1">
+                          DRAG AND DROP AUDIO
+                        </textPath>
+                    </text>
+                
+                </svg>
+                <svg
+                id="text2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 150 150"
+                >
+                    <circle cx="75" cy="75" r="75"/>
+                    <path
+                        id="curve2"
+                        d="M75,.75A74.25,74.25,0,1,1,.75,75,74.34,74.34,0,0,1,75,.75M75,0a75,75,0,1,0,75,75A75,75,0,0,0,75,0Z"
+                    />
+                    <text width="100">
+                        <textPath xlink:href="#curve2">
+                          OR CLICK TO PLAY SAMPLE
+                        </textPath>
+                    </text>
+                </svg>
+                <svg
+                id="text3"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 150 150"
+                >
+                    <circle cx="75" cy="75" r="75"/>
+                        <path
+                            id="curve3"
+                            d="M0,75a75,75 0 1,0 150,0a75,75 0 1,0 -150,0"
+                        />
+                    <text width="100">
+                        <textPath xlink:href="#curve3">
+                          ESC + SPACEBAR + ARROW KEYS TO NAVIGATE
+                        </textPath>
+                    </text>
+                </svg>
+                <svg
+                id="text4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 150 150"
+                >
+                    <circle cx="75" cy="75" r="75"/>
+                    <path
+                        id="curve4"
+                        d="M0,75a75,75 0 1,0 150,0a75,75 0 1,0 -150,0"
+                    />
+                    <text width="100">
+                        <textPath xlink:href="#curve4">
+                          SUN AS ARCHITECT
+                        </textPath>
+                    </text>
+                </svg>
+            </div>
+        </main> 
     </body>
     <script src="script.js"></script>
 </html>

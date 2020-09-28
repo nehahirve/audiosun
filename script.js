@@ -11,28 +11,33 @@ const colorway = {
     medium: '#FF8C00',
     dark: '#FF4500',
     complement: '#ffc800',
-    accent: '#FFFFE0'
+    background: '#ffc800',
+    solidRing: '#FFA500',
+    accent: '#FFFFC0'
   },
   cool: {
     light: '#00DFFF',
     medium: '#008CFF',
     dark: '#0000CD',
     complement: '#ffc800',
-    accent: '#FFFFE0'
+    background: '#00AFFF',
+    solidRing: '#ffc800',
+    accent: '#FFFFC0'
   }
 }
 
 const canvas = document.querySelector('canvas')
 const ctx = canvas.getContext('2d')
-const startBtn = document.querySelector('.play')
+const button = document.querySelector('.wrapper')
+const main = document.querySelector('main')
 
 let mode = 'warm'
 let WIDTH = canvas.width
 let HEIGHT = canvas.height
 
 let audioctx, source, analyser, freqs, radius,
-  radians, bars, circlePathFactor, angle, meanFreq, dashIntervals,
-  barFactor, rValue, bValue, gValue, isMobile, hasStarted
+  radians, rays, rayPositionIncrement, angle, meanFreq, dashIntervals,
+  rayHeightFactor, rValue, bValue, gValue, isMobile, hasStarted
 
 let isRunning = false
 
@@ -83,8 +88,39 @@ function setFillStyle () {
   if (meanFreq) {
     ctx.fillStyle = `rgb(${rValue}, ${gValue - meanFreq / 2}, ${bValue})`
   } else {
-    ctx.fillStyle = colorway[mode].complement
+    ctx.fillStyle = colorway[mode].background
   }
+}
+
+function setAnimationValues() {
+  // INITIAL ANIMATION VALUES SET
+  freqs = new Uint8Array(analyser.frequencyBinCount)
+  dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
+  angle = 0
+  rayPositionIncrement = 1
+  gValue = 200
+  isRunning = true
+}
+
+function setMainColours(element) {
+  main.style.backgroundColor = colorway[mode].background
+  const rings = element.children[0].children
+  rings[0].style.borderColor = colorway[mode].medium
+  rings[1].style.borderTopColor = colorway[mode].solidRing
+  rings[1].style.borderLeftColor = colorway[mode].solidRing
+  rings[2].style.borderTopColor = colorway[mode].solidRing
+  rings[2].style.borderLeftColor = colorway[mode].solidRing
+  rings[3].style.borderTopColor = colorway[mode].dark
+  rings[3].style.borderLeftColor = colorway[mode].dark
+  rings[4].style.borderTopColor = colorway[mode].dark
+  rings[5].style.borderTopColor = colorway[mode].medium
+  rings[5].style.borderLeftColor = colorway[mode].medium
+  rings[6].style.borderTopColor = colorway[mode].medium
+  rings[6].style.borderLeftColor = colorway[mode].medium
+  rings[7].children[2].children[0].style.fill = colorway[mode].dark
+  rings[8].children[2].children[0].style.fill = colorway[mode].medium
+  rings[9].children[2].children[0].style.fill = colorway[mode].dark
+  rings[10].children[2].children[0].style.fill = colorway[mode].accent
 }
 
 /*
@@ -96,12 +132,16 @@ EVENT HANDLERS
 function keyHandler (e) { // controls colouring
   if (e.keyCode === 32) { // spacebar
     mode = mode === 'warm' ? 'cool' : 'warm'
+    setMainColours(main)
   }
   if (e.keyCode === 38) { // up arrow
-    gValue = gValue > 245 ? 255 : gValue += 10
+    gValue = gValue > 255 ? 255 : gValue += 10
   }
   if (e.keyCode === 40) { // down arrow
     gValue = gValue < 10 ? 0 : gValue -= 10
+  }
+  if (e.keyCode === 27) {
+    destroy(0)
   }
 }
 
@@ -110,7 +150,8 @@ function dragHandler (e) { // when files dragged across
   e.stopPropagation()
 }
 
-function clickHandler () { // toggles pause and play
+function clickHandler () {
+  // toggles pause and play
   if (audioctx.state === 'running') {
     isRunning = false
     audioctx.suspend()
@@ -127,11 +168,13 @@ ON LOAD
 *********************************
 */
 
+setMainColours(main)
 resizeCanvas()
-
 window.addEventListener('drop', init)
+window.addEventListener('click', init)
 window.addEventListener('dragover', dragHandler, false)
 window.addEventListener('resize', resizeCanvas)
+window.addEventListener('keydown', keyHandler)
 
 /*
 *********************************
@@ -140,20 +183,21 @@ MAIN FUNCTIONS
 */
 
 function init (e) {
-  hasStarted = true
+  window.removeEventListener('click', init)
+  e.stopImmediatePropagation()
   e.preventDefault()
   e.stopPropagation()
+  hasStarted = true
 
   // RESETS ADUIO CONTEXT AND ANIMATIONS
   isRunning = false
 
-  if (audioctx) {
-    audioctx.suspend()
+  if (audioctx && audioctx.state !== 'closed') {
     audioctx.close()
   }
 
   // LOAD CANVAS AND AUDIOCONTEXT
-  startBtn.style.opacity = 0
+  main.style.opacity = 0
   canvas.style.opacity = 1
 
   audioctx = new (
@@ -161,9 +205,28 @@ function init (e) {
   )()
 
   window.addEventListener('click', clickHandler)
-  window.addEventListener('keydown', keyHandler)
+  // DECIDES TYPE OF AUDIO NODE TO CREATE
+  if (event.type === 'click' || event.type === 'touchstart') {
+    loadAudioFile(e)
+  } else {
+    loadAudioBufferFile(e)
+  }
+}
 
-  // DECODE AUDIO BUFFER
+// DECODE AUDIO BUFFER
+function loadAudioFile (e) {
+  const song = new Audio()
+  song.src = 'media/sample.mp3'
+  source = audioctx.createMediaElementSource(song)
+  analyser = audioctx.createAnalyser()
+  analyser.connect(audioctx.destination)
+  source.connect(analyser)
+  song.play()
+  setAnimationValues()
+  draw()
+}
+
+function loadAudioBufferFile (e) {
   const file = e.dataTransfer.files[0]
   const reader = new FileReader()
 
@@ -176,13 +239,7 @@ function init (e) {
       analyser.connect(audioctx.destination)
       source.connect(analyser)
       source.start(0)
-      // INITIAL ANIMATION VALUES SET
-      freqs = new Uint8Array(analyser.frequencyBinCount)
-      dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
-      angle = 0
-      circlePathFactor = 1
-      gValue = 200
-      isRunning = true
+      setAnimationValues()
       draw()
     })
   })
@@ -190,15 +247,19 @@ function init (e) {
 }
 
 function draw () {
-  circlePathFactor -= 0.05
+  if (audioctx.state === 'closed') return
+  if (source) source.addEventListener('ended', destroy.bind(source, 1500))
+
+  rayPositionIncrement -= 0.05
   angle += 0.001
 
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.fillRect(0, 0, WIDTH, HEIGHT)
+
   drawStaticRings(ctx, radius)
 
   // CENTER MOVING RING
-  ctx.setLineDash([5, 5])
   ctx.beginPath()
+  ctx.setLineDash([5, 5])
   ctx.strokeStyle = colorway[mode].complement
   ctx.lineWidth = 7
   ctx.arc(
@@ -212,7 +273,7 @@ function draw () {
   ctx.closePath()
   ctx.setLineDash([])
 
-  // BARS
+  // RAYS
   ctx.lineWidth = 4
 
   ctx.setLineDash(dashIntervals)
@@ -223,20 +284,20 @@ function draw () {
   rValue = mode === 'warm' ? 255 : 0
   bValue = mode === 'warm' ? 0 : 255
 
-  for (let i = 0; i < bars; i++) {
+  for (let i = 0; i < rays; i++) {
     meanArray.push(freqs[i])
-    const barHeight = freqs[i] * barFactor
+    const rayHeight = freqs[i] * rayHeightFactor
 
     const barColour = `rgb(${rValue}, ${255 - freqs[i]}, ${bValue})`
 
     const x = (WIDTH / 2) +
-      Math.cos(radians * (i + circlePathFactor)) * radius
+      Math.cos(radians * (i + rayPositionIncrement)) * radius
     const xEnd = (WIDTH / 2) +
-      Math.cos(radians * (i + circlePathFactor)) * (radius + barHeight)
+      Math.cos(radians * (i + rayPositionIncrement)) * (radius + rayHeight)
     const y = (HEIGHT / 2) +
-      Math.sin(radians * (i + circlePathFactor)) * radius
+      Math.sin(radians * (i + rayPositionIncrement)) * radius
     const yEnd = (HEIGHT / 2) +
-      Math.sin(radians * (i + circlePathFactor)) * (radius + barHeight)
+      Math.sin(radians * (i + rayPositionIncrement)) * (radius + rayHeight)
 
     ctx.strokeStyle = barColour
 
@@ -244,6 +305,7 @@ function draw () {
     ctx.moveTo(x, y)
     ctx.lineTo(xEnd, yEnd)
     ctx.stroke()
+    ctx.closePath()
   }
 
   // SET BACKGROUND COLOUR
@@ -260,17 +322,35 @@ function resizeCanvas () {
   canvas.height = window.innerHeight
   HEIGHT = canvas.height
   setFillStyle()
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
+  ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
   if (!isRunning) {
-    center(startBtn, 100)
+    center(button, 150)
   }
 
   isMobile = WIDTH < breakpoint
 
-  bars = isMobile ? 100 : 200
-  radians = (Math.PI * 2) / bars
+  rays = isMobile ? 100 : 200
+  radians = (Math.PI * 2) / rays
   radius = isMobile ? 100 : 150
-  barFactor = isMobile ? 0.4 : 1
+  rayHeightFactor = isMobile ? 0.4 : 1
   if (hasStarted && !isRunning) draw()
+}
+
+function destroy (timeout = 1500, e) {
+  setTimeout(function () {
+    if (audioctx && audioctx.state !== 'closed') {
+      audioctx.close()
+    }
+    hasStarted = false
+    isRunning = false
+    setFillStyle()
+    ctx.fillRect(0, 0, WIDTH, HEIGHT)
+    center(button, 150)
+    canvas.style.opacity = 0
+    main.style.opacity = 1
+    window.addEventListener('click', init)
+  }, timeout)
+
+  window.removeEventListener('click', clickHandler)
 }

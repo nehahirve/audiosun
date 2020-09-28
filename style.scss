@@ -1,58 +1,130 @@
 html {
   cursor: crosshair;
-  background-color: #ffc800;
+  background-color:none;
   overflow: hidden;
+  background: #ffc800;
+}
+
+main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  transition: 500ms;
 }
 
 canvas {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: 3000ms;
+  transition: 2000ms;
 }
 
 @mixin circle {
-  z-index: -10;
   position: absolute;
   border-radius: 50%;
 }
 
-.play {
-  transition: 1000ms;
-  font-size: 2rem;
-  color: #FFFFE0;
-  width: 200px;
-  position: fixed;
-  height: 200px;
+.wrapper {
+  position: absolute;
+  height: 300px;
+  width: 300px;
   border-radius: 50%;
-  border: 7px orange solid;
+  padding-right: 2px;
+  border: 7px solid transparent;
   display: flex;
   align-items: center;
+  align-items: center;
+  font-size: 3rem;
+  color: #FFFFE0;
   justify-content: flex-end;
   text-align: right;
-  background:none;
-  &:focus {
-    outline: none;
+  .ringone {
+    @include circle;
+    width: 350px;
+    height: 350px;
+    left: -33px;
+    border: 2px solid transparent;
   }
-  .innerone {
+  .ringtwo_start, .ringtwo_end {
+    @include circle;
+    width: 300px;
+    height: 300px;
+    left: -7px;
+    border: 7px solid transparent;
+  }
+  .ringthree_start, .ringthree_end {
+    @include circle;
+    top: 30px;
+    left: 30px;
+    width: 225px;
+    height: 225px;
+    border: 4px dashed transparent;
+  }
+  .ringfour_start, .ringfour_end {
     @include circle;
     width: 150px;
     height: 150px;
-    left: 20px;
-    border: 4px orangered dashed;
+    top: 67px;
+    left: 67px;
+    border: 2px solid transparent;
   }
-  .innertwo {
-    @include circle;
-    width: 220px;
-    height: 220px;
-    left: -17px;
-    border: 2px darkorange solid;
+  .ringtwo_start {
+    transform: rotate(-130deg);
   }
-  .innerthree {
-    @include circle;
-    width: 80px;
-    height: 80px;
-    left: 55px;
-    border: 2px darkorange solid;
+  .ringtwo_end {
+    transform: rotate(132deg);
+  }
+  .ringthree_start {
+    transform: rotate(-120deg);
+  }
+  .ringthree_end {
+    transform: rotate(79deg);
+  }
+  .ringfour_start {
+    transform: rotate(53deg);
+  }
+}
+
+svg {
+  fill:transparent;
+  position: absolute;
+  overflow: visible;
+}
+
+#text1 {
+  transform: scale(1) rotate(-84deg);
+  textPath {
+    font-variation-settings: 'wght' 250;
+    letter-spacing: 2px;
+    font-size: 0.5rem;
+  }
+}
+
+#text2 {
+  transform: scale(0.75) rotate(-70deg);
+  textPath {
+    font-variation-settings: 'wght' 500;
+    letter-spacing: 2px;
+    font-size: 0.5rem;
+  }
+}
+
+#text3 {
+  transform: scale(1.56) rotate(-84deg);
+  textPath {
+    font-variation-settings: 'wght' 100;
+    letter-spacing: 2px;
+    font-size: 0.3rem;
+  }
+}
+
+#text4 {
+  transform: scale(0.54) rotate(-49deg);
+  textPath {
+    font-variation-settings: 'wght' 550;
+    letter-spacing: 5px;
+    font-size: 0.7rem;
   }
 }

@@ -3,6 +3,11 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Oswald';
+  src: url('fonts/Oswald-VariableFont_wght.ttf') format('truetype');
+}
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -22,7 +27,7 @@ time, mark, audio, video, button {
 	font-size: 14px;
 	font: inherit;
     vertical-align: baseline;
-		font-family: 'Abril Fatface', monospace;
+		font-family: 'Oswald', sans-serif;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
