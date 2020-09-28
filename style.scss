@@ -1,5 +1,8 @@
 html {
-  cursor: crosshair;
+  cursor: -webkit-image-set(
+  url('/media/plus.svg') 1x,
+  url('/media/plus.svg') 2x
+), crosshair;
   background-color:none;
   overflow: hidden;
   background: #ffc800;
@@ -82,9 +85,6 @@ canvas {
   .ringthree_end {
     transform: rotate(79deg);
   }
-  .ringfour_start {
-    transform: rotate(53deg);
-  }
 }
 
 svg {
@@ -121,10 +121,10 @@ svg {
 }
 
 #text4 {
-  transform: scale(0.54) rotate(-49deg);
   textPath {
     font-variation-settings: 'wght' 550;
     letter-spacing: 5px;
     font-size: 0.7rem;
   }
+  
 }
