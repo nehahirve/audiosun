@@ -1,9 +1,13 @@
+@mixin circle {
+  position: absolute;
+  border-radius: 50%;
+}
+
 html {
   cursor: -webkit-image-set(
   url('images/cursor.svg') 1x,
   url('images/cursor.svg') 2x
-), crosshair;
-  background-color:none;
+  ), crosshair;
   overflow: hidden;
   background: #ffc800;
 }
@@ -24,25 +28,14 @@ canvas {
   transition: 2000ms;
 }
 
-@mixin circle {
-  position: absolute;
-  border-radius: 50%;
-}
-
 .wrapper {
   position: absolute;
   height: 300px;
   width: 300px;
   border-radius: 50%;
-  padding-right: 2px;
   border: 7px solid transparent;
   display: flex;
   align-items: center;
-  align-items: center;
-  font-size: 3rem;
-  color: #FFFFE0;
-  justify-content: flex-end;
-  text-align: right;
   .ringone {
     @include circle;
     width: 350px;
@@ -94,7 +87,7 @@ svg {
 }
 
 #text1 {
-  transform: scale(1) rotate(-84deg);
+  transform: rotate(-84deg);
   textPath {
     font-variation-settings: 'wght' 250;
     letter-spacing: 2px;
@@ -126,5 +119,4 @@ svg {
     letter-spacing: 5px;
     font-size: 0.7rem;
   }
-  
 }

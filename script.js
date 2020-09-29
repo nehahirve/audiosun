@@ -8,7 +8,7 @@ const breakpoint = 750 // mobile breakpoint
 
 const canvas = document.querySelector('canvas') // grab important DOM elements
 const ctx = canvas.getContext('2d')
-const button = document.querySelector('.wrapper')
+const splashimage = document.querySelector('.wrapper')
 const main = document.querySelector('main')
 
 const colorway = {
@@ -51,60 +51,6 @@ HELPER FUNCTIONS
 *********************************
 */
 
-function ring (ctx, radius, weight, stroke) { // draws a ring to canvas
-  ctx.beginPath()
-  ctx.strokeStyle = stroke
-  ctx.lineWidth = weight
-  ctx.arc(WIDTH / 2, HEIGHT / 2, radius, 0, 2 * Math.PI)
-  ctx.stroke()
-  ctx.closePath()
-}
-
-function center (el, halfsize) { // centers an element
-  el.style.top = `${(HEIGHT / 2) - (halfsize)}px`
-  el.style.left = `${(WIDTH / 2) - (halfsize)}px`
-}
-
-function average (array) { // finds mean of array
-  const sum = array.reduce((sum, value) => {
-    return sum + value
-  })
-  return sum / array.length
-}
-
-function drawStaticRings (ctx, radius) { // draws all the static rings on canvas
-  ctx.setLineDash([])
-  ring(ctx, radius - 20, 4, colorway[mode].complement)
-  ring(ctx, radius - 30, 2, colorway[mode].light)
-  ring(ctx, radius - 40, 4, colorway[mode].medium)
-  ring(ctx, radius - 55, 4, colorway[mode].medium)
-  ring(ctx, radius - 85, 1, colorway[mode].dark)
-  ring(ctx, radius - 90, 1.5, colorway[mode].accent)
-  if (!isMobile) {
-    ring(ctx, radius - 110, 10, colorway[mode].light)
-    ring(ctx, radius - 130, 3, colorway[mode].medium)
-  } else {
-    ring(ctx, radius - 100, 10, colorway[mode].light)
-  }
-}
-
-function setFillStyle () { // calculcates canvas background colour
-  if (meanFreq) {
-    ctx.fillStyle = `rgb(${rValue}, ${gValue - meanFreq / 1.4}, ${bValue})`
-  } else {
-    ctx.fillStyle = colorway[mode].background
-  }
-}
-
-function setAnimationValues () { // SETS INITIAL ANIMATION VALUES
-  freqs = new Uint8Array(analyser.frequencyBinCount)
-  dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
-  angle = 0
-  rayPositionIncrement = 1
-  gValue = 200
-  isRunning = true
-}
-
 function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
   main.style.backgroundColor = colorway[mode].background
   const rings = Array.from(main.children[0].children)
@@ -127,11 +73,66 @@ function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
 
 function animateCenterRing () { // animates the splash page ring
   if (!sunAngle) sunAngle = 0
-  main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle-264}deg)`
-  main.children[0].children[6].style.transform = `rotate(${sunAngle+110}deg)`
-  main.children[0].children[5].style.transform = `rotate(${sunAngle+55}deg)`
+  main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle - 264}deg)`
+  main.children[0].children[6].style.transform = `rotate(${sunAngle + 110}deg)`
+  main.children[0].children[5].style.transform = `rotate(${sunAngle + 55}deg)`
   sunAngle -= 0.1
   if (!canvasStarted) requestAnimationFrame(animateCenterRing)
+}
+
+function drawStaticRings (ctx, radius) { // draws all the static rings on canvas
+  ctx.setLineDash([])
+  ring(ctx, radius - 20, 4, colorway[mode].complement)
+  ring(ctx, radius - 30, 2, colorway[mode].light)
+  ring(ctx, radius - 40, 4, colorway[mode].medium)
+  ring(ctx, radius - 55, 4, colorway[mode].medium)
+  ring(ctx, radius - 85, 1, colorway[mode].dark)
+  ring(ctx, radius - 90, 1.5, colorway[mode].accent)
+  if (!isMobile) {
+    ring(ctx, radius - 110, 10, colorway[mode].light)
+    ring(ctx, radius - 130, 3, colorway[mode].medium)
+  } else {
+    ring(ctx, radius - 100, 10, colorway[mode].light)
+  }
+}
+
+function ring (ctx, radius, weight, stroke) { // draws a ring to canvas
+  ctx.beginPath()
+  ctx.strokeStyle = stroke
+  ctx.lineWidth = weight
+  ctx.arc(WIDTH / 2, HEIGHT / 2, radius, 0, 2 * Math.PI)
+  ctx.stroke()
+  ctx.closePath()
+}
+
+function paintBackground () { // calculcates canvas background colour
+  if (meanFreq) {
+    ctx.fillStyle = `rgb(${rValue}, ${gValue - meanFreq / 1.4}, ${bValue})`
+  } else {
+    ctx.fillStyle = colorway[mode].background
+  }
+  ctx.fillRect(0, 0, WIDTH, HEIGHT)
+}
+
+function setAnimationValues () { // SETS INITIAL ANIMATION VALUES
+  freqs = new Uint8Array(analyser.frequencyBinCount)
+  dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
+  angle = 0
+  rayPositionIncrement = 1
+  gValue = 200
+  isRunning = true
+}
+
+function center (el, halfsize) { // centers an element
+  el.style.top = `${(HEIGHT / 2) - (halfsize)}px`
+  el.style.left = `${(WIDTH / 2) - (halfsize)}px`
+}
+
+function average (array) { // finds mean of array
+  const sum = array.reduce((sum, value) => {
+    return sum + value
+  })
+  return sum / array.length
 }
 
 /*
@@ -183,6 +184,7 @@ resizeCanvas()
 animateCenterRing()
 window.addEventListener('drop', init)
 window.addEventListener('click', init)
+window.addEventListener('touchstart', init)
 window.addEventListener('dragover', dragHandler, false)
 window.addEventListener('resize', resizeCanvas)
 window.addEventListener('keydown', keyHandler)
@@ -195,9 +197,7 @@ MAIN FUNCTIONS
 
 function init (e) {
   window.removeEventListener('click', init)
-  e.stopImmediatePropagation()
   e.preventDefault()
-  e.stopPropagation()
   canvasStarted = true
 
   // RESETS ADUIO CONTEXT AND ANIMATIONS
@@ -216,15 +216,16 @@ function init (e) {
   )()
 
   window.addEventListener('click', clickHandler)
+
   // DECIDES TYPE OF AUDIO NODE TO CREATE
-  if (event.type === 'click' || event.type === 'touchstart') {
+  if (e.type === 'click' || e.type === 'touchstart') {
     loadAudioFile(e)
   } else {
-    loadAudioBufferFile(e)
+    loadAudioBuffer(e)
   }
 }
 
-function loadAudioFile (e) {
+function loadAudioFile (e) { // PLAY PRE-LOADED SAMPLE
   const song = new Audio()
   song.src = 'media/sample.mp3'
   source = audioctx.createMediaElementSource(song)
@@ -236,8 +237,7 @@ function loadAudioFile (e) {
   draw()
 }
 
-// DECODE AUDIO BUFFER
-function loadAudioBufferFile (e) {
+function loadAudioBuffer (e) { // DECODE AUDIO BUFFER
   const file = e.dataTransfer.files[0]
   const reader = new FileReader()
 
@@ -250,7 +250,7 @@ function loadAudioBufferFile (e) {
       analyser.connect(audioctx.destination)
       source.connect(analyser)
       source.start(0)
-      if (audioctx.state === 'suspended') audioctx.resume()
+      if (audioctx.state === 'suspended') audioctx.resume() // bugfix for safari
       setAnimationValues()
       draw()
     })
@@ -259,17 +259,17 @@ function loadAudioBufferFile (e) {
 }
 
 function draw () {
-  if (audioctx.state === 'closed') return
-  if (source) source.addEventListener('ended', destroy.bind(source, 1500))
+  if (audioctx.state === 'closed') return // prevents paint after destroy
+  if (source) {
+    source.addEventListener('ended', destroy.bind(source, 1500))
+  }
 
-  rayPositionIncrement -= 0.05
-  angle += 0.001
-
-  ctx.fillRect(0, 0, WIDTH, HEIGHT)
-
+  paintBackground()
   drawStaticRings(ctx, radius)
 
   // CENTER MOVING RING
+  angle += 0.001
+
   ctx.beginPath()
   ctx.setLineDash([5, 5])
   ctx.strokeStyle = colorway[mode].complement
@@ -287,7 +287,7 @@ function draw () {
 
   // RAYS
   ctx.lineWidth = 4
-
+  rayPositionIncrement -= 0.05
   ctx.setLineDash(dashIntervals)
   analyser.getByteFrequencyData(freqs)
 
@@ -320,9 +320,8 @@ function draw () {
     ctx.closePath()
   }
 
-  // SET BACKGROUND COLOUR
+  // GET MEAN FREQUENCY AMPLITUDE
   meanFreq = average(meanArray)
-  setFillStyle()
 
   // CONTINUE LOOP
   if (isRunning) requestAnimationFrame(draw)
@@ -333,11 +332,10 @@ function resizeCanvas () {
   WIDTH = canvas.width
   canvas.height = window.innerHeight
   HEIGHT = canvas.height
-  setFillStyle()
-  ctx.fillRect(0, 0, WIDTH, HEIGHT)
+  paintBackground()
 
   if (!isRunning) {
-    center(button, 150)
+    center(splashimage, 150)
   }
 
   isMobile = WIDTH < breakpoint
@@ -349,6 +347,7 @@ function resizeCanvas () {
   if (canvasStarted && !isRunning) draw()
 }
 
+// needed a timeout since ended event always triggers too early
 function destroy (timeout = 1500, e) {
   setTimeout(function () {
     if (audioctx && audioctx.state !== 'closed') {
@@ -356,10 +355,9 @@ function destroy (timeout = 1500, e) {
     }
     canvasStarted = false
     isRunning = false
-    setFillStyle()
-    ctx.fillRect(0, 0, WIDTH, HEIGHT)
-    center(button, 150)
-    if (!canvasStarted) animateCenterRing()
+    paintBackground()
+    center(splashimage, 150)
+    animateCenterRing()
     canvas.style.opacity = 0
     main.style.opacity = 1
     window.addEventListener('click', init)
