@@ -1,8 +1,5 @@
 html {
-  cursor: -webkit-image-set(
-  url('/media/plus.svg') 1x,
-  url('/media/plus.svg') 2x
-), crosshair;
+  cursor: url('/media/plus.svg'), crosshair;
   background-color:none;
   overflow: hidden;
   background: #ffc800;
