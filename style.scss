@@ -1,7 +1,7 @@
 html {
   cursor: -webkit-image-set(
-  url('media/cursor.svg') 1x,
-  url('media/cursor.svg') 2x
+  url('images/cursor.svg') 1x,
+  url('images/cursor.svg') 2x
 ), crosshair;
   //cursor: url('/media/plus.svg'), crosshair;
   background-color:none;
@@ -113,9 +113,9 @@ svg {
 }
 
 #text3 {
-  transform: scale(1.56) rotate(-84deg);
+  transform: scale(1.6) rotate(-74deg);
   textPath {
-    font-variation-settings: 'wght' 100;
+    font-variation-settings: 'wght' 400;
     letter-spacing: 2px;
     font-size: 0.3rem;
   }
