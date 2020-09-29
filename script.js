@@ -96,7 +96,7 @@ function setFillStyle () {
   }
 }
 
-function setAnimationValues() { // INITIAL ANIMATION VALUES SET
+function setAnimationValues () { // INITIAL ANIMATION VALUES SET
   freqs = new Uint8Array(analyser.frequencyBinCount)
   dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
   angle = 0
