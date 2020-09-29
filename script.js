@@ -41,7 +41,7 @@ let audioctx, source, analyser, freqs, meanFreq // audio context globals
 let isRunning = false // binaries
 let isMobile, canvasStarted
 
-let sunAngle, radius, radians, rays, // visualiser math
+let sunAngle, radius, radians, rays, // animation math variables
   rayPositionIncrement, angle,
   dashIntervals, rayHeightFactor, rValue, bValue, gValue
 
@@ -51,7 +51,7 @@ HELPER FUNCTIONS
 *********************************
 */
 
-function ring (ctx, radius, weight, stroke) {
+function ring (ctx, radius, weight, stroke) { // draws a ring to canvas
   ctx.beginPath()
   ctx.strokeStyle = stroke
   ctx.lineWidth = weight
@@ -60,19 +60,19 @@ function ring (ctx, radius, weight, stroke) {
   ctx.closePath()
 }
 
-function center (el, halfsize) {
+function center (el, halfsize) { // centers an element
   el.style.top = `${(HEIGHT / 2) - (halfsize)}px`
   el.style.left = `${(WIDTH / 2) - (halfsize)}px`
 }
 
-function average (array) {
+function average (array) { // finds mean of array
   const sum = array.reduce((sum, value) => {
     return sum + value
   })
   return sum / array.length
 }
 
-function drawStaticRings (ctx, radius) {
+function drawStaticRings (ctx, radius) { // draws all the static rings on canvas
   ctx.setLineDash([])
   ring(ctx, radius - 20, 4, colorway[mode].complement)
   ring(ctx, radius - 30, 2, colorway[mode].light)
@@ -88,7 +88,7 @@ function drawStaticRings (ctx, radius) {
   }
 }
 
-function setFillStyle () {
+function setFillStyle () { // calculcates canvas background colour
   if (meanFreq) {
     ctx.fillStyle = `rgb(${rValue}, ${gValue - meanFreq / 1.4}, ${bValue})`
   } else {
@@ -96,7 +96,7 @@ function setFillStyle () {
   }
 }
 
-function setAnimationValues () { // INITIAL ANIMATION VALUES SET
+function setAnimationValues () { // SETS INITIAL ANIMATION VALUES
   freqs = new Uint8Array(analyser.frequencyBinCount)
   dashIntervals = [5, 5, 10, 15, 25, 20, 35, 10, 50]
   angle = 0
@@ -105,7 +105,7 @@ function setAnimationValues () { // INITIAL ANIMATION VALUES SET
   isRunning = true
 }
 
-function setMainColours () {
+function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
   main.style.backgroundColor = colorway[mode].background
   const rings = Array.from(main.children[0].children)
   rings[0].style.borderColor = colorway[mode].medium
@@ -117,21 +117,19 @@ function setMainColours () {
   rings[3].style.borderTopColor = colorway[mode].dark
   rings[3].style.borderLeftColor = colorway[mode].dark
   rings[4].style.borderTopColor = colorway[mode].dark
-  rings.slice(5, 7).forEach(ring => {
-    ring.style.borderTopColor = colorway[mode].medium
-    ring.style.borderLeftColor = colorway[mode].medium
-  })
+  rings[5].style.borderTopColor = colorway[mode].medium
+  rings[6].style.borderTopColor = colorway[mode].background
   rings[7].children[1].children[0].style.fill = colorway[mode].dark
   rings[8].children[1].children[0].style.fill = colorway[mode].medium
   rings[9].children[1].children[0].style.fill = colorway[mode].dark
   rings[10].children[1].children[0].style.fill = colorway[mode].accent
 }
 
-function animateCenterRing () {
+function animateCenterRing () { // animates the splash page ring
   if (!sunAngle) sunAngle = 0
-  main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle-49}deg)`
-  main.children[0].children[6].style.transform = `rotate(${sunAngle+53}deg)`
-  main.children[0].children[5].style.transform = `rotate(${sunAngle}deg)`
+  main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle-264}deg)`
+  main.children[0].children[6].style.transform = `rotate(${sunAngle+110}deg)`
+  main.children[0].children[5].style.transform = `rotate(${sunAngle+55}deg)`
   sunAngle -= 0.1
   if (!canvasStarted) requestAnimationFrame(animateCenterRing)
 }

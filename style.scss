@@ -3,7 +3,6 @@ html {
   url('images/cursor.svg') 1x,
   url('images/cursor.svg') 2x
 ), crosshair;
-  //cursor: url('/media/plus.svg'), crosshair;
   background-color:none;
   overflow: hidden;
   background: #ffc800;
@@ -123,7 +122,7 @@ svg {
 
 #text4 {
   textPath {
-    font-variation-settings: 'wght' 550;
+    font-variation-settings: 'wght' 590;
     letter-spacing: 5px;
     font-size: 0.7rem;
   }
