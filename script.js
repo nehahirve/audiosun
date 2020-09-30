@@ -36,7 +36,7 @@ let mode = 'warm' // some defaults on loading
 let WIDTH = canvas.width
 let HEIGHT = canvas.height
 
-let audioctx, source, analyser, freqs, meanFreq // audio context globals
+let audioctx, source, song, analyser, freqs, meanFreq // audio context globals
 
 let isRunning = false // binaries
 let isMobile, canvasStarted
@@ -55,6 +55,7 @@ function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
   main.style.backgroundColor = colorway[mode].background
   const rings = Array.from(main.children[0].children)
   rings[0].style.borderColor = colorway[mode].medium
+
   rings.slice(1, 3).forEach(ring => {
     ring.style.borderTopColor = colorway[mode].solidRing
     ring.style.borderLeftColor = colorway[mode].solidRing
@@ -73,11 +74,15 @@ function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
 
 function animateCenterRing () { // animates the splash page ring
   if (!sunAngle) sunAngle = 0
+  console.log('animating')
+
   main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle - 264}deg)`
   main.children[0].children[6].style.transform = `rotate(${sunAngle + 110}deg)`
   main.children[0].children[5].style.transform = `rotate(${sunAngle + 55}deg)`
   sunAngle -= 0.1
-  if (!canvasStarted) requestAnimationFrame(animateCenterRing)
+
+  if (!canvasStarted) requestAnimationFrame(animateCenterRing) 
+  else sunAngle = 0
 }
 
 function drawStaticRings (ctx, radius) { // draws all the static rings on canvas
@@ -152,7 +157,7 @@ function keyHandler (e) { // controls colouring
   if (e.keyCode === 40) { // down arrow
     gValue = gValue < 1 ? 0 : gValue -= 10
   }
-  if (e.keyCode === 27 && canvasStarted) {
+  if (e.keyCode === 27 && canvasStarted) { // escape
     destroy(0)
   }
 }
@@ -216,6 +221,7 @@ function init (e) {
   )()
 
   window.addEventListener('click', clickHandler)
+  window.addEventListener('touchstart', clickHandler)
 
   // DECIDES TYPE OF AUDIO NODE TO CREATE
   if (e.type === 'click' || e.type === 'touchstart') {
@@ -226,7 +232,7 @@ function init (e) {
 }
 
 function loadAudioFile (e) { // PLAY PRE-LOADED SAMPLE
-  const song = new Audio()
+  song = new Audio()
   song.src = 'media/sample.mp3'
   source = audioctx.createMediaElementSource(song)
   analyser = audioctx.createAnalyser()
@@ -262,6 +268,7 @@ function draw () {
   if (audioctx.state === 'closed') return // prevents paint after destroy
   if (source) {
     source.addEventListener('ended', destroy.bind(source, 1500))
+    song.addEventListener('ended', destroy.bind(song, 1500))
   }
 
   paintBackground()
@@ -289,6 +296,7 @@ function draw () {
   ctx.lineWidth = 4
   rayPositionIncrement -= 0.05
   ctx.setLineDash(dashIntervals)
+
   analyser.getByteFrequencyData(freqs)
 
   const meanArray = []
@@ -353,10 +361,10 @@ function destroy (timeout = 1500, e) {
     if (audioctx && audioctx.state !== 'closed') {
       audioctx.close()
     }
-    canvasStarted = false
     isRunning = false
     paintBackground()
     center(splashimage, 150)
+    canvasStarted = false
     animateCenterRing()
     canvas.style.opacity = 0
     main.style.opacity = 1
@@ -364,4 +372,5 @@ function destroy (timeout = 1500, e) {
   }, timeout)
 
   window.removeEventListener('click', clickHandler)
+  window.removeEventListener('touchstart', clickHandler)
 }
