@@ -74,7 +74,6 @@ function setMainColours () { // COLOURS SPLASH PAGE ACCORDING TO MODE
 
 function animateCenterRing () { // animates the splash page ring
   if (!sunAngle) sunAngle = 0
-  console.log('animating')
 
   main.children[0].children[10].style.transform = `scale(0.54) rotate(${sunAngle - 264}deg)`
   main.children[0].children[6].style.transform = `rotate(${sunAngle + 110}deg)`
